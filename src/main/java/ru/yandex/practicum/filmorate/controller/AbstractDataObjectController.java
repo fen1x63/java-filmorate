@@ -26,7 +26,7 @@ public abstract class AbstractDataObjectController<T extends DataObject> impleme
     public ResponseEntity<Collection<T>> read() {
         Collection<?> collection = service.getAll();
         Iterator<?> it = collection.iterator();
-        if (it.hasNext()){
+        if (it.hasNext()) {
             log.debug("Return {} {}-objects", collection.size(), it.next().getClass().getSimpleName());
         } else {
             log.debug("Return zero objects");
