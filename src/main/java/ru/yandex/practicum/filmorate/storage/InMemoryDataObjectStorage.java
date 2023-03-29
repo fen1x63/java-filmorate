@@ -37,7 +37,8 @@ public class InMemoryDataObjectStorage<T extends DataObject> implements DataObje
     private Long manageAssignId(T object) {
         if (object.getId() == null) {
             if (idCounter != 0L && objects.containsKey(idCounter)) {
-                while (objects.containsKey(++idCounter)) { }
+                while (objects.containsKey(++idCounter)) {
+                }
                 return idCounter;
             } else {
                 return ++idCounter;
