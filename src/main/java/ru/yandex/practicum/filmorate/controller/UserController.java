@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +16,7 @@ import java.util.stream.Collectors;
 @RestController("")
 @RequestMapping("/users")
 public class UserController {
+
 
     private static Integer currentMaxId = 0;
     private final Map<Integer, User> users = new HashMap<>();
