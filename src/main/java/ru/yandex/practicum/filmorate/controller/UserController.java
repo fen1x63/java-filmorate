@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
 
-    private static Integer currentMaxId = 0;
+    private static Integer currentMaxId = 1;
     private final Map<Integer, User> users = new HashMap<>();
 
     @PostMapping
