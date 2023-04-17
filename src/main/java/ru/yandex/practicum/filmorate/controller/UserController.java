@@ -23,7 +23,7 @@ public class UserController {
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
 
-        user.setId(currentMaxId++);
+        user.setId(++currentMaxId);
         users.put(currentMaxId, user);
         log.info("createUser: {}", user);
         return user;
