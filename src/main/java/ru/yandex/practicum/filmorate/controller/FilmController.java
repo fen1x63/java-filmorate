@@ -20,10 +20,14 @@ import java.util.stream.Collectors;
 @RequestMapping("/films")
 public class FilmController {
 
-    private static Integer currentMaxId = 0;
     private final Map<Integer, Film> films = new HashMap<>();
+
+
+    //поскольку мы храним фильмы прямо в контроллере, учет ID делаем тут же.
+    private static Integer currentMaxId = 0;
     @Autowired
     private List<FilmValidator> validators = new ArrayList<>();
+
 
 
     @PostMapping
@@ -36,14 +40,16 @@ public class FilmController {
     }
 
     @PutMapping
-    public void updateFilm(@Valid @RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         validators.stream().forEach(it -> it.validate(film));
-        if (films.containsKey(film.getId())) {
+        if (films.containsKey(film.getId())){
 
             log.debug("updateFilm: {}", film);
             films.put(film.getId(), film);
+            return film;
         }
         log.debug("error updateFilm without ID: {}", film);
+        return null;
     }
 
     @GetMapping
@@ -51,4 +57,5 @@ public class FilmController {
         log.info("findAll");
         return films.values().stream().collect(Collectors.toList());
     }
+
 }
