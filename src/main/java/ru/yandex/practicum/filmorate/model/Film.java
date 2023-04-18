@@ -12,8 +12,16 @@ import java.time.LocalDate;
 @Data
 public class Film {
     private int id;
-    @NotNull @NotBlank private String name;
-    @NotNull @NotBlank private String description;
-    @NotNull @Past private LocalDate releaseDate;
-    @NotNull @DurationMin(minutes = 0L) private Duration duration;
+    @NotNull
+    @NotBlank
+    private String name;
+    @NotNull
+    @NotBlank
+    private String description;
+    @NotNull
+    @Past
+    private LocalDate releaseDate;
+    @NotNull
+    @DurationMin(minutes = 0L)
+    private Duration duration;
 }
