@@ -59,8 +59,7 @@ public class UserController {
 
     @ExceptionHandler(ru.yandex.practicum.filmorate.exception.ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleValidationException
-            (ru.yandex.practicum.filmorate.exception.ValidationException e) {
+    public ResponseEntity<String> handleValidationException(ru.yandex.practicum.filmorate.exception.ValidationException e) {
         log.warn("Ошибка валидации: " + e.getMessage());
         return new ResponseEntity<>("not valid due to validation error: " + e.getMessage(),
                 HttpStatus.BAD_REQUEST);
