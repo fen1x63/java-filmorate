@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping(value = "/films", produces = "application/json")
 public class FilmController {
 
-    private final LocalDate UNCORRECTDATE = LocalDate.of(1895,12,28);
+    private static final LocalDate UNCORRECTDATE = LocalDate.of(1895,12,28);
     private final HashMap<Integer, Film> films = new HashMap<>();
     private int idForFilm = 0;
 
