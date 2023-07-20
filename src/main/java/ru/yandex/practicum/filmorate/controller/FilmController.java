@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.FilmException;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -18,6 +18,7 @@ import java.util.List;
 @RequestMapping(value = "/films", produces = "application/json")
 public class FilmController {
 
+    private final String UNCORRECTDATE = "1895-12-28";
     private final HashMap<Integer, Film> films = new HashMap<>();
     private int idForFilm = 0;
 
@@ -39,7 +40,7 @@ public class FilmController {
             log.info("Поступил запрос на изменения фильма. Фильм изменён.");
         } else {
             log.error("Поступил запрос на изменения фильма. Фильм не найден.");
-            throw new FilmException("Film not found.");
+            throw new EntityNotFoundException("Film not found.");
         }
         return film;
     }
@@ -54,8 +55,8 @@ public class FilmController {
         return ++idForFilm;
     }
 
-    private void filmValidation(Film film) throws ValidationException {
-        if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) {
+    private void filmValidation(Film film) {
+        if (film.getReleaseDate().isBefore(LocalDate.parse(UNCORRECTDATE))) {
             throw new ValidationException("Некорректно указана дата релиза.");
 
         }
