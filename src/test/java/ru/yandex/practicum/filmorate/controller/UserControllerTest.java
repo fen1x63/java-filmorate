@@ -54,7 +54,7 @@ public class UserControllerTest {
                         .contentType("application/json"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.name").value(""));
+                .andExpect(jsonPath("$.name").value(testUser.getLogin()));
     }
 
     @Test
