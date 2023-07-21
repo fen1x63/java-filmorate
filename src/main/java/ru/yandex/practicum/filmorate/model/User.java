@@ -7,6 +7,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
+import java.util.Set;
 
 
 @Builder
@@ -22,6 +23,15 @@ public class User {
     private String name;
     @Past
     private LocalDate birthday;
+    private Set<Integer> friends;
+
+    public Set<Integer> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(Set<Integer> friends) {
+        this.friends = friends;
+    }
 
     public int getId() {
         return id;
