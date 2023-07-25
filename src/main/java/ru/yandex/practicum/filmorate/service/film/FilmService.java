@@ -24,16 +24,28 @@ public class FilmService {
         filmStorage.getFilmById(filmId).getLikes().add(userId);
     }
 
+    public void checkId(Integer id) {
+        if (id < 0) {
+            throw new EntityNotFoundException("Id не может быть отрицательным");
+        }
+    }
+
     public void deleteLike(int userId, int filmId) {
-        if (filmStorage.getFilmById(filmId).getLikes().contains(userId)) {
-            filmStorage.getFilmById(filmId).getLikes().remove(userId);
-        } else throw new EntityNotFoundException("Пользователь не ставил лайк этому фильму.");
+        Film film = filmStorage.getFilmById(filmId);
+        if (film.getLikes().contains(userId)) {
+            film.getLikes().remove(userId);
+        } else {
+            throw new EntityNotFoundException("Пользователь не ставил лайк этому фильму.");
+        }
     }
 
     public List<Film> getTopFilms(int count) {
-        return filmStorage.findAllFilms().stream().sorted((film1, film2) ->
+        return filmStorage.findAllFilms()
+                .stream()
+                .sorted((film1, film2) ->
                         film2.getLikes().size() - film1.getLikes().size())
-                .limit(count).collect(Collectors.toList());
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
 }
