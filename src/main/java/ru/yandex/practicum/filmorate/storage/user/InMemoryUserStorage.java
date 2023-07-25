@@ -3,13 +3,9 @@ package ru.yandex.practicum.filmorate.storage.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -65,8 +61,10 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public List<User> getMutualFriends(Integer userId, Integer friendId) {
         List<User> mutualFriends = new ArrayList<>();
-        for (Integer id : getUserById(userId).getFriends()) {
-            if (getUserById(friendId).getFriends().contains(id)) {
+        Set<Integer> userFriends = getUserById(userId).getFriends();
+        Set<Integer> friendFriends = getUserById(friendId).getFriends();
+        for (Integer id : userFriends) {
+            if (friendFriends.contains(id)) {
                 mutualFriends.add(getUserById(id));
             }
         }
@@ -78,7 +76,7 @@ public class InMemoryUserStorage implements UserStorage {
         return ++idForUser;
     }
 
-    private void userValidation(User user) throws ValidationException {
+    private void userValidation(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -86,15 +84,19 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User addFriend(Integer userId, Integer friendId) {
-        getUserById(userId).getFriends().add(friendId);
-        getUserById(friendId).getFriends().add(userId);
+        Set<Integer> userFriends = getUserById(userId).getFriends();
+        Set<Integer> friendFriends = getUserById(friendId).getFriends();
+        userFriends.add(friendId);
+        friendFriends.add(userId);
         return getUserById(userId);
     }
 
     @Override
     public User deleteFriend(Integer userId, Integer friendId) {
-        getUserById(userId).getFriends().remove(friendId);
-        getUserById(friendId).getFriends().remove(userId);
+        Set<Integer> userFriends = getUserById(userId).getFriends();
+        Set<Integer> friendFriends = getUserById(friendId).getFriends();
+        userFriends.remove(friendId);
+        friendFriends.remove(userId);
         return getUserById(userId);
     }
 
