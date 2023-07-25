@@ -9,10 +9,12 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
 @Slf4j
+@Valid
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/films", produces = "application/json")
@@ -58,8 +60,9 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}/like/{filmId}")
-    public void deleteLike(@PathVariable @Positive Integer id, @PathVariable Integer filmId) {
+    public void deleteLike(@PathVariable @Positive Integer id, @PathVariable @PositiveOrZero Integer filmId) {
         filmService.checkId(filmId);
         log.info("Поступил запрос на удаление лайка у фильма.");
+        filmService.deleteLike(filmId, id);
     }
 }
