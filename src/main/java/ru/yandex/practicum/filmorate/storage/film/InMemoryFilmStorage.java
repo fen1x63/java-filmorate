@@ -53,14 +53,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film getFilmById(int id) {
         if (films.containsKey(id)) {
             return films.get(id);
-        } else throw new EntityNotFoundException("Film not found.");
+        } else {
+            throw new EntityNotFoundException("Film not found.");
+        }
     }
 
     private int getIdForFilm() {
         return ++idForFilm;
     }
 
-    private void filmValidation(Film film) throws ValidationException {
+    private void filmValidation(Film film) {
         if (film.getReleaseDate().isBefore(UNCORRECTDATE)
                 || film.getReleaseDate().isAfter(LocalDate.now())) {
             throw new ValidationException("Некорректно указана дата релиза.");
