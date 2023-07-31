@@ -23,6 +23,24 @@ public class Film {
     @Positive
     private int duration;
     private Set<Integer> likes;
+    private Set<String> genre;
+    private String mpaRating;
+
+    public Set<String> getGenre() {
+        return genre;
+    }
+
+    public void setGenre(Set<String> genre) {
+        this.genre = genre;
+    }
+
+    public String getMpaRating() {
+        return mpaRating;
+    }
+
+    public void setMpaRating(String mpaRating) {
+        this.mpaRating = mpaRating;
+    }
 
     public Set<Integer> getLikes() {
         return likes;

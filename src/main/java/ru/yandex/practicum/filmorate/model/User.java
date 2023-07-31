@@ -24,6 +24,24 @@ public class User {
     @Past
     private LocalDate birthday;
     private Set<Integer> friends;
+    private Set<Integer> friendRequestsSent;
+    private Set<Integer> friendRequestsReceived;
+
+    public Set<Integer> getFriendRequestsSent() {
+        return friendRequestsSent;
+    }
+
+    public void setFriendRequestsSent(Set<Integer> friendRequestsSent) {
+        this.friendRequestsSent = friendRequestsSent;
+    }
+
+    public Set<Integer> getFriendRequestsReceived() {
+        return friendRequestsReceived;
+    }
+
+    public void setFriendRequestsReceived(Set<Integer> friendRequestsReceived) {
+        this.friendRequestsReceived = friendRequestsReceived;
+    }
 
     public Set<Integer> getFriends() {
         return friends;
