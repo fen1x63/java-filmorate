@@ -2,46 +2,30 @@ package ru.yandex.practicum.filmorate.service.film;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class FilmService {
 
     private final FilmStorage filmStorage;
 
-    public void like(int filmId, int userId) {
-        filmStorage.getFilmById(filmId).getLikes().add(userId);
+    public Film like(int filmId, int userId) {
+        return filmStorage.like(filmId, userId);
     }
 
-    public void checkId(Integer id) {
-        if (id < 0) {
-            throw new EntityNotFoundException("Id не может быть отрицательным");
-        }
-    }
-
-    public void deleteLike(int userId, int filmId) {
-        Film film = filmStorage.getFilmById(filmId);
-        if (film.getLikes().contains(userId)) {
-            film.getLikes().remove(userId);
-        } else {
-            throw new EntityNotFoundException("Пользователь не ставил лайк этому фильму.");
-        }
+    public Film deleteLike(int filmId, int userId) {
+        return filmStorage.deleteLike(filmId, userId);
     }
 
     public List<Film> getTopFilms(int count) {
-        return filmStorage.findAllFilms()
-                .stream()
-                .sorted((film1, film2) ->
-                        film2.getLikes().size() - film1.getLikes().size())
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getRating(count);
     }
 
 }

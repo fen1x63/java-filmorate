@@ -1,12 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
-import lombok.NonNull;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -14,33 +12,33 @@ import java.util.Set;
 public class User {
 
     private int id;
-    @Email
-    @NonNull
+
+    @NotEmpty
+    @Email(message = "Некорректный email.")
     private String email;
-    @NonNull
-    @NotBlank
+
+    @NotBlank(message = "Логин не может быть пустым.")
+    @Pattern(regexp = "\\S*", message = "Логин содержит пробелы.")
     private String login;
+
     private String name;
-    @Past
+    @NotNull
+    @PastOrPresent(message = "Некорректна указана дата рождения.")
     private LocalDate birthday;
+
     private Set<Integer> friends;
-    private Set<Integer> friendRequestsSent;
-    private Set<Integer> friendRequestsReceived;
 
-    public Set<Integer> getFriendRequestsSent() {
-        return friendRequestsSent;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id && email.equals(user.email) && login.equals(user.login) && name.equals(user.name) && birthday.equals(user.birthday) && friends.equals(user.friends);
     }
 
-    public void setFriendRequestsSent(Set<Integer> friendRequestsSent) {
-        this.friendRequestsSent = friendRequestsSent;
-    }
-
-    public Set<Integer> getFriendRequestsReceived() {
-        return friendRequestsReceived;
-    }
-
-    public void setFriendRequestsReceived(Set<Integer> friendRequestsReceived) {
-        this.friendRequestsReceived = friendRequestsReceived;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, login, name, birthday, friends);
     }
 
     public Set<Integer> getFriends() {

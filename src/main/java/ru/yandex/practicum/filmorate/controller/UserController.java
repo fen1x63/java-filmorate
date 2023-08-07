@@ -12,13 +12,14 @@ import java.util.List;
 
 
 @Slf4j
-@RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/users", produces = "application/json")
+@RestController
+@RequestMapping("/users")
 public class UserController {
 
     private final UserStorage userStorage;
     private final UserService userService;
+
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
@@ -33,9 +34,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+    public User addFriend(@PathVariable String id, @PathVariable String friendId) {
         log.info("Поступил запрос на добавления в друзья.");
-        return userService.addFriend(id, friendId);
+        return userService.addFriend(Integer.parseInt(id), Integer.parseInt(friendId));
     }
 
     @GetMapping
@@ -45,26 +46,28 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Integer id) {
+    public User getUserById(@PathVariable String id) {
         log.info("Поступил запрос на получение пользователя по id.");
-        return userStorage.getUserById(id);
+        return userStorage.getUserById(Integer.parseInt(id));
     }
 
+
     @GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable Integer id) {
+    public List<User> getFriends(@PathVariable String id) {
         log.info("Поступил запрос на получение списка друзей.");
-        return userService.getUserFriends(id);
+        return userService.getUserFriends(Integer.parseInt(id));
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getMutualFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
+    public List<User> getMutualFriends(@PathVariable String id, @PathVariable String otherId) {
         log.info("Поступил запрос на получения списка общих друзей.");
-        return userService.getMutualFriends(id, otherId);
+        return userService.getMutualFriends(Integer.parseInt(id), Integer.parseInt(otherId));
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public void deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+    public void deleteFriend(@PathVariable String id, @PathVariable String friendId) {
         log.info("Поступил запрос на удаление из друзей.");
-        userService.deleteFriend(id, friendId);
+        userService.deleteFriend(Integer.parseInt(id), Integer.parseInt(friendId));
     }
+
 }

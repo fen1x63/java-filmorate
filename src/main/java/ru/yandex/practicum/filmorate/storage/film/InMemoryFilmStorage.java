@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -43,8 +44,8 @@ public class InMemoryFilmStorage implements FilmStorage {
             films.put(film.getId(), film);
             log.info("Поступил запрос на изменения фильма. Фильм изменён.");
         } else {
-            log.error("Поступил запрос на изменения фильма. Фильм не найден.");
-            throw new EntityNotFoundException("Film not found.");
+            log.error("Поступил запрос на изменения фильма.");
+            throw new EntityNotFoundException("Фильм не найден.");
         }
         return film;
     }
@@ -54,7 +55,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (films.containsKey(id)) {
             return films.get(id);
         } else {
-            throw new EntityNotFoundException("Film not found.");
+            throw new EntityNotFoundException("Фильм не найден.");
         }
     }
 
@@ -73,6 +74,37 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film.getDescription().length() > 200) {
             throw new ValidationException("Превышено количество символов в описании фильма.");
         }
+    }
+
+    public static void checkId(Integer id) {
+        if (id < 0) {
+            throw new EntityNotFoundException("Id не может быть отрицательным");
+        }
+    }
+
+    public Film deleteLike(int userId, int filmId) {
+        Film film = getFilmById(filmId);
+        if (film.getLikes().contains(userId)) {
+            film.getLikes().remove(userId);
+        } else {
+            throw new EntityNotFoundException("Пользователь не ставил лайк этому фильму.");
+        }
+        return film;
+    }
+
+    @Override
+    public Film like(int filmId, int userId) {
+        getFilmById(filmId).getLikes().add(userId);
+        return getFilmById(filmId);
+    }
+
+    public List<Film> getRating(int count) {
+        return findAllFilms()
+                .stream()
+                .sorted((film1, film2) ->
+                        film2.getLikes().size() - film1.getLikes().size())
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
 }
