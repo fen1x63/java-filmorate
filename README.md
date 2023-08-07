@@ -2,7 +2,7 @@
 Template repository for Filmorate project.
 Ссылка на диаграмму таблицы проекта
 https://dbdiagram.io/d/64c7712902bd1c4a5ef74a8f
-![alt text](https://github.com/fen1x63/java-filmorate/blob/cebd67a7d487a5c9981e41c02c7dae911d2b7dd8/ER%203%20FORM.png)
+![alt text](https://github.com/fen1x63/java-filmorate/blob/8b2723725166887c8e7dd714f5a7230f7925fe21/DataBase.png)
 1. Добавление нового фильма в базу данных:
 INSERT INTO films (name, description, realise_date, duration, rating_mpa_id) VALUES ('The Shawshank Redemption', 'Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.', '1994-09-23', 142, 3);
 
