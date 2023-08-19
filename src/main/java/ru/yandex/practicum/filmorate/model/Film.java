@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import ru.yandex.practicum.filmorate.validator.ReleaseDate;
 
 import javax.validation.constraints.NotBlank;
@@ -8,10 +9,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.Set;
 
-
+@EqualsAndHashCode
 @Builder
 public class Film {
 
@@ -29,19 +29,6 @@ public class Film {
     private Set<Genre> genres;
     @NotNull
     private Mpa mpa;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Film film = (Film) o;
-        return id == film.id && duration == film.duration && name.equals(film.name) && description.equals(film.description) && releaseDate.equals(film.releaseDate) && likes.equals(film.likes) && genres.equals(film.genres) && mpa.equals(film.mpa);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, releaseDate, duration, likes, genres, mpa);
-    }
 
     public Set<Genre> getGenres() {
         return genres;

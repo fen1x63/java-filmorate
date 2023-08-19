@@ -5,12 +5,10 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,9 +40,8 @@ public class InMemoryFilmStorage implements FilmStorage {
             filmValidation(film);
             film.setLikes(new HashSet<>());
             films.put(film.getId(), film);
-            log.info("Поступил запрос на изменения фильма. Фильм изменён.");
+            log.info("Фильм изменён.");
         } else {
-            log.error("Поступил запрос на изменения фильма.");
             throw new EntityNotFoundException("Фильм не найден.");
         }
         return film;
@@ -64,6 +61,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     private void filmValidation(Film film) {
+        checkId(film.getId());
+        Set<Genre> set = new HashSet<>();
+        if (film.getGenres() != null) {
+            for (Genre element : film.getGenres()) {
+                if (!set.contains(element)) {
+                    set.add(element);
+                }
+            }
+        }
+        film.setGenres(set);
         if (film.getReleaseDate().isBefore(UNCORRECTDATE)
                 || film.getReleaseDate().isAfter(LocalDate.now())) {
             throw new ValidationException("Некорректно указана дата релиза.");

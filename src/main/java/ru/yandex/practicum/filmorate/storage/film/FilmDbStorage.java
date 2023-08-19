@@ -3,16 +3,17 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.service.film.GenreService;
+import ru.yandex.practicum.filmorate.service.film.MpaService;
 import ru.yandex.practicum.filmorate.storage.like.LikeStorage;
-import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,10 +25,9 @@ import java.util.*;
 @Component
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final UserStorage userStorage;
-    private final MpaDbStorage mpaDbStorage;
+    private final MpaService mpaService;
     private final LikeStorage likeDbStorage;
-    private final GenreDbStorage genreDbStorage;
+    private final GenreService genreService;
 
     @Override
     public List<Film> findAllFilms() {
@@ -41,9 +41,9 @@ public class FilmDbStorage implements FilmStorage {
                     .description(filmRows.getString("description"))
                     .releaseDate(Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate())
                     .duration(filmRows.getInt("duration"))
-                    .mpa(mpaDbStorage.getMpa(filmRows.getInt("rating_mpa_id")))
+                    .mpa(mpaService.getMpa(filmRows.getInt("rating_mpa_id")))
                     .build();
-            film.setGenres(genreDbStorage.getGenreForCurrentFilm(film.getId()));
+            film.setGenres(getGenreForCurrentFilm(film.getId()));
             film.setLikes(likeDbStorage.getLikesForCurrentFilm(film.getId()));
 
             films.add(film);
@@ -57,9 +57,9 @@ public class FilmDbStorage implements FilmStorage {
                 .withTableName("films")
                 .usingGeneratedKeyColumns("film_id");
         film.setId(simpleJdbcInsert.executeAndReturnKey(toMap(film)).intValue());
-        mpaDbStorage.addMpaToFilm(film);
-        genreDbStorage.addGenreNameToFilm(film);
-        genreDbStorage.addGenresForCurrentFilm(film);
+        mpaService.addMpaToFilm(film);
+        genreService.addGenresForCurrentFilm(film);
+        genreService.addGenreNameToFilm(film);
         log.info("Поступил запрос на добавление фильма. Фильм добавлен.");
         return film;
     }
@@ -70,14 +70,16 @@ public class FilmDbStorage implements FilmStorage {
                 "name=?, description=?, release_date=?, duration=?, rating_mpa_id=? WHERE film_id=?";
         int rowsCount = jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(),
                 film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId());
-        mpaDbStorage.addMpaToFilm(film);
-        genreDbStorage.updateGenresForCurrentFilm(film);
-        genreDbStorage.addGenreNameToFilm(film);
-        film.setGenres(genreDbStorage.getGenreForCurrentFilm(film.getId()));
         if (rowsCount > 0) {
+            mpaService.addMpaToFilm(film);
+            genreService.updateGenresForCurrentFilm(film);
+            genreService.addGenreNameToFilm(film);
+            film.setGenres(getGenreForCurrentFilm(film.getId()));
             return film;
         }
-        throw new EntityNotFoundException("Фильм не найден.");
+        else {
+            throw new EntityNotFoundException("Фильм не найден.");
+        }
     }
 
     @Override
@@ -86,7 +88,7 @@ public class FilmDbStorage implements FilmStorage {
                 "FROM films WHERE film_id=?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
-        } catch (RuntimeException e) {
+        } catch (EmptyResultDataAccessException e) {
             throw new EntityNotFoundException("Фильм не найден.");
         }
     }
@@ -101,9 +103,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film deleteLike(int filmId, int userId) {
-        if (userStorage.getUserById(userId) == null) {
-            throw new EntityNotFoundException("Пользователь не найден.");
-        }
         Film film = getFilmById(filmId);
         String sqlQuery = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
         jdbcTemplate.update(sqlQuery, filmId, userId);
@@ -127,10 +126,10 @@ public class FilmDbStorage implements FilmStorage {
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getInt("duration"))
-                .mpa(mpaDbStorage.getMpa(resultSet.getInt("rating_mpa_id")))
+                .mpa(mpaService.getMpa(resultSet.getInt("rating_mpa_id")))
                 .build();
         film.setLikes(likeDbStorage.getLikesForCurrentFilm(film.getId()));
-        film.setGenres(genreDbStorage.getGenreForCurrentFilm(film.getId()));
+        film.setGenres(getGenreForCurrentFilm(film.getId()));
         return film;
     }
 
@@ -142,5 +141,15 @@ public class FilmDbStorage implements FilmStorage {
         values.put("duration", film.getDuration());
         values.put("rating_mpa_id", film.getMpa().getId());
         return values;
+    }
+
+    public Set<Genre> getGenreForCurrentFilm(int id) {
+        Set<Genre> genreSet = new LinkedHashSet<>();
+        SqlRowSet genreRows = jdbcTemplate.queryForRowSet("SELECT id, film_id, genre_id FROM genre " +
+                "WHERE film_id = ? GROUP BY id ORDER BY genre_id ASC", id);
+        while (genreRows.next()) {
+            genreSet.add(genreService.getGenreForId(genreRows.getInt("genre_id")));
+        }
+        return genreSet;
     }
 }

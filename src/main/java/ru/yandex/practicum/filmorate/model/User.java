@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.Set;
 
-
+@EqualsAndHashCode
 @Builder
 public class User {
 
@@ -27,19 +27,6 @@ public class User {
     private LocalDate birthday;
 
     private Set<Integer> friends;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id == user.id && email.equals(user.email) && login.equals(user.login) && name.equals(user.name) && birthday.equals(user.birthday) && friends.equals(user.friends);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, email, login, name, birthday, friends);
-    }
 
     public Set<Integer> getFriends() {
         return friends;

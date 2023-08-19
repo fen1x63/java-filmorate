@@ -1,12 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
-import lombok.Data;
-
 
 import javax.validation.constraints.NotNull;
 
-@Data
 @Builder
 public class Mpa {
 
@@ -15,4 +12,19 @@ public class Mpa {
     @NotNull
     private String name;
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

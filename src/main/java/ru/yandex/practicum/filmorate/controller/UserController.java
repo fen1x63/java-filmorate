@@ -34,9 +34,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable String id, @PathVariable String friendId) {
+    public User addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
         log.info("Поступил запрос на добавления в друзья.");
-        return userService.addFriend(Integer.parseInt(id), Integer.parseInt(friendId));
+        return userService.addFriend(id, friendId);
     }
 
     @GetMapping
@@ -46,28 +46,28 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable String id) {
+    public User getUserById(@PathVariable Integer id) {
         log.info("Поступил запрос на получение пользователя по id.");
-        return userStorage.getUserById(Integer.parseInt(id));
+        return userStorage.getUserById(id);
     }
 
 
     @GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable String id) {
+    public List<User> getFriends(@PathVariable Integer id) {
         log.info("Поступил запрос на получение списка друзей.");
-        return userService.getUserFriends(Integer.parseInt(id));
+        return userService.getUserFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getMutualFriends(@PathVariable String id, @PathVariable String otherId) {
+    public List<User> getMutualFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
         log.info("Поступил запрос на получения списка общих друзей.");
-        return userService.getMutualFriends(Integer.parseInt(id), Integer.parseInt(otherId));
+        return userService.getMutualFriends(id, otherId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public void deleteFriend(@PathVariable String id, @PathVariable String friendId) {
+    public void deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
         log.info("Поступил запрос на удаление из друзей.");
-        userService.deleteFriend(Integer.parseInt(id), Integer.parseInt(friendId));
+        userService.deleteFriend(id, friendId);
     }
 
 }

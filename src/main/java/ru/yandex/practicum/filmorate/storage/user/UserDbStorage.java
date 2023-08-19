@@ -1,14 +1,16 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,9 +23,11 @@ import java.util.stream.Collectors;
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final UserService userService;
 
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
+    public UserDbStorage(JdbcTemplate jdbcTemplate, @Lazy UserService userService) {
         this.jdbcTemplate = jdbcTemplate;
+        this.userService = userService;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        validationUser(user);
+        userService.validationUser(user);
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("user_id");
@@ -56,7 +60,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        validationUser(user);
+        userService.validationUser(user);
         String sqlQuery = "UPDATE users SET " +
                 "email=?, login=?, name=?, birthday=? WHERE user_id=?";
         int rowsCount = jdbcTemplate.update(sqlQuery, user.getEmail(), user.getLogin(),
@@ -92,9 +96,11 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getMutualFriends(Integer id, Integer otherId) {
-        String sqlQuery = "SELECT user_id, email, login, name, birthday FROM users WHERE user_id IN(" +
-                "SELECT friend_id FROM friends WHERE user_id = ?) " +
-                "AND user_id IN(SELECT friend_id FROM friends WHERE user_id = ?)";
+        String sqlQuery = "SELECT u.user_id, u.email, u.login, u.name, u.birthday " +
+                "FROM users u " +
+                "JOIN friends f1 ON u.user_id = f1.friend_id " +
+                "JOIN friends f2 ON u.user_id = f2.friend_id " +
+                "WHERE f1.user_id = ? AND f2.user_id = ?";
         return new ArrayList<>(jdbcTemplate.query(sqlQuery, this::mapRowToUser, id, otherId));
     }
 
@@ -103,15 +109,17 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "SELECT user_id, email, login, name, birthday FROM users WHERE user_id=?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
-        } catch (RuntimeException e) {
+        } catch (EmptyResultDataAccessException e) {
             throw new EntityNotFoundException("Пользователь не найден.");
         }
     }
 
     @Override
     public List<User> getFriendsByUserId(Integer id) {
-        String sqlQuery = "SELECT user_id, email, login, name, birthday FROM users WHERE user_id IN" +
-                "(SELECT friend_id FROM friends WHERE user_id=?)";
+        String sqlQuery = "SELECT u.user_id, u.email, u.login, u.name, u.birthday " +
+                "FROM users u " +
+                "JOIN friends f ON u.user_id = f.friend_id " +
+                "WHERE f.user_id = ?";
         return new ArrayList<>(jdbcTemplate.query(sqlQuery, this::mapRowToUser, id));
     }
 
@@ -134,12 +142,6 @@ public class UserDbStorage implements UserStorage {
                 .build();
         user.setFriends(getFriendsByUserId(user.getId()).stream().map(User::getId).collect(Collectors.toSet()));
         return user;
-    }
-
-    private void validationUser(User user) throws ValidationException {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
     }
 
 }
