@@ -9,8 +9,6 @@ public interface GenreStorage {
 
     List<Genre> findAll();
 
-    void addGenresForCurrentFilm(Film film);
-
     void updateGenresForCurrentFilm(Film film);
 
     Genre getGenreForId(int id);

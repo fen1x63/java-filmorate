@@ -26,7 +26,7 @@ public class GenreService {
 
     public void addGenresForCurrentFilm(Film film) {
         if (film.getGenres() != null) {
-            genreDbStorage.addGenresForCurrentFilm(film);
+            genreDbStorage.updateGenresForCurrentFilm(film);
         }
     }
     public void addGenreNameToFilm(Film film) {
@@ -44,8 +44,4 @@ public class GenreService {
         return genreDbStorage.getGenreForId(genreId);
     }
 
-
-    public void updateGenresForCurrentFilm(Film film) {
-        genreDbStorage.updateGenresForCurrentFilm(film);
-    }
 }

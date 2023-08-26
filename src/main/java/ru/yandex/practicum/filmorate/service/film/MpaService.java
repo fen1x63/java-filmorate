@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service.film;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
@@ -19,15 +18,7 @@ public class MpaService {
         return mpaDbStorage.findAll();
     }
 
-    public void addMpaToFilm(Film film) {
-        mpaDbStorage.addMpaToFilm(film);
-    }
-
-    public Mpa getMpaRating(int ratingMpaId) {
-        return mpaDbStorage.getMpa(ratingMpaId);
-    }
-
-    public Mpa getMpa(int mpaId) {
+    public Mpa getMpa(Integer mpaId) {
        return mpaDbStorage.getMpa(mpaId);
     }
 }

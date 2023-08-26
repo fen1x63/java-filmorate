@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import ru.yandex.practicum.filmorate.validator.ReleaseDate;
 
 import javax.validation.constraints.NotBlank;
@@ -11,7 +13,8 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.Set;
 
-@EqualsAndHashCode
+@Getter
+@Setter
 @Builder
 public class Film {
 
@@ -25,72 +28,12 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private int duration;
+    @EqualsAndHashCode.Exclude
     private Set<Integer> likes;
+    @EqualsAndHashCode.Exclude
     private Set<Genre> genres;
     @NotNull
+    @EqualsAndHashCode.Exclude
     private Mpa mpa;
 
-    public Set<Genre> getGenres() {
-        return genres;
-    }
-
-    public void setGenres(Set<Genre> genres) {
-        this.genres = genres;
-    }
-
-    public Mpa getMpa() {
-        return mpa;
-    }
-
-    public void setMpa(Mpa mpa) {
-        this.mpa = mpa;
-    }
-
-    public Set<Integer> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(Set<Integer> likes) {
-        this.likes = likes;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
 }

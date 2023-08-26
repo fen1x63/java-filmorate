@@ -17,11 +17,9 @@ public class LikeDbStorage implements LikeStorage {
 
     public Set<Integer> getLikesForCurrentFilm(int id) {
         Set<Integer> likes = new HashSet<>();
-        SqlRowSet likeRows = jdbcTemplate.queryForRowSet("SELECT like_id, film_id, user_id FROM likes");
+        SqlRowSet likeRows = jdbcTemplate.queryForRowSet("SELECT like_id FROM likes WHERE film_id = ?", id);
         while (likeRows.next()) {
-            if (likeRows.getInt("film_id") == id) {
-                likes.add(likeRows.getInt("like_id"));
-            }
+            likes.add(likeRows.getInt("like_id"));
         }
         return likes;
     }

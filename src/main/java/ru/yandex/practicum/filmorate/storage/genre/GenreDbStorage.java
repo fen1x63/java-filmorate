@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.service.film.GenreService;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,8 +23,6 @@ import java.util.Set;
 public class GenreDbStorage implements GenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final GenreService genreService;
-
 
     public List<Genre> findAll() {
         List<Genre> genreList = new ArrayList<>();
@@ -41,25 +38,18 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     public void updateGenresForCurrentFilm(Film film) {
-        String sqlQuery = "DELETE FROM genre WHERE film_id = ?";
-        jdbcTemplate.update(sqlQuery, film.getId());
-        addGenresForCurrentFilm(film);
-    }
+        String deleteQuery = "DELETE FROM genre WHERE film_id = ?";
+        String insertQuery = "INSERT IGNORE INTO genre(film_id, genre_id) VALUES (?, ?)";
 
-    public void addGenresForCurrentFilm(Film film) {
-        String selectQuery = "SELECT COUNT(*) FROM genre WHERE film_id = ? AND genre_id = ?";
-        String insertQuery = "INSERT INTO genre(film_id, genre_id) VALUES (?, ?)";
+        jdbcTemplate.update(deleteQuery, film.getId());
 
-        Set existingGenres = new HashSet<>();
-        List uniqueGenres = new ArrayList<>();
+        Set<Integer> existingGenres = new HashSet<>();
+        List<Genre> uniqueGenres = new ArrayList<>();
         if (film.getGenres() != null) {
             film.getGenres().forEach(g -> {
-                Integer count = jdbcTemplate.queryForObject(selectQuery, Integer.class, film.getId(), g.getId());
-                if (count == null || count == 0) {
-                    if (!existingGenres.contains(g.getId())) {
-                        existingGenres.add(g.getId());
-                        uniqueGenres.add(g);
-                    }
+                if (!existingGenres.contains(g.getId())) {
+                    existingGenres.add(g.getId());
+                    uniqueGenres.add(g);
                 }
             });
         }
@@ -68,7 +58,7 @@ public class GenreDbStorage implements GenreStorage {
 
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                Genre genre = (Genre) uniqueGenres.get(i);
+                Genre genre = uniqueGenres.get(i);
                 ps.setInt(1, film.getId());
                 ps.setInt(2, genre.getId());
             }

@@ -2,11 +2,15 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.Set;
 
+@Getter
+@Setter
 @EqualsAndHashCode
 @Builder
 public class User {
@@ -27,52 +31,4 @@ public class User {
     private LocalDate birthday;
 
     private Set<Integer> friends;
-
-    public Set<Integer> getFriends() {
-        return friends;
-    }
-
-    public void setFriends(Set<Integer> friends) {
-        this.friends = friends;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDate getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday;
-    }
 }

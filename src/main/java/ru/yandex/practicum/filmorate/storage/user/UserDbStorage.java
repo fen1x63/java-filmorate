@@ -78,7 +78,7 @@ public class UserDbStorage implements UserStorage {
         User user = getUserById(userId);
         try {
             getUserById(friendId);
-        } catch (RuntimeException e) {
+        } catch (EmptyResultDataAccessException e) {
             throw new EntityNotFoundException("Пользователь не найден.");
         }
         String sqlQuery = "INSERT INTO friends (user_id, friend_id) VALUES(?, ?)";

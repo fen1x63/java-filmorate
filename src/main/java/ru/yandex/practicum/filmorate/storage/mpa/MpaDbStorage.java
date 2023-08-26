@@ -5,14 +5,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -40,14 +38,6 @@ public class MpaDbStorage implements MpaStorage {
         } catch (RuntimeException e) {
             throw new EntityNotFoundException("Рейтинг mpa не найден.");
         }
-    }
-
-    public void addMpaToFilm(Film film) {
-        findAll().forEach(mpa -> {
-            if (Objects.equals(film.getMpa().getId(), mpa.getId())) {
-                film.setMpa(mpa);
-            }
-        });
     }
 
     private Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
