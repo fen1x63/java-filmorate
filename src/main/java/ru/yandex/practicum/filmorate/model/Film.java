@@ -43,8 +43,8 @@ public class Film {
             Integer duration,
             LocalDate releaseDate,
             Mpa mpa,
-            Set <Genre> genres,
-            Set <Integer> likes
+            Set<Genre> genres,
+            Set<Integer> likes
     ) {
         return Film.builder()
                 .id(id)
