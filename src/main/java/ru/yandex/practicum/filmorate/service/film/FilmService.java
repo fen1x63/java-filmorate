@@ -3,8 +3,10 @@ package ru.yandex.practicum.filmorate.service.film;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 
@@ -14,6 +16,7 @@ import java.util.List;
 public class FilmService {
 
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     public Film getFilmById(Integer filmId) {
         return filmStorage.getFilmById(filmId);
@@ -37,6 +40,9 @@ public class FilmService {
     }
 
     public Film deleteLike(Integer filmId, Integer userId) {
+        if (userStorage.getUserById(userId) == null) {
+            throw new EntityNotFoundException("Пользователь не найден.");
+        }
         Film film = filmStorage.deleteLike(filmId, userId);
         return film;
     }

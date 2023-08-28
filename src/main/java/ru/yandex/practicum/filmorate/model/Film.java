@@ -36,4 +36,25 @@ public class Film {
     @EqualsAndHashCode.Exclude
     private Mpa mpa;
 
+    public static Film filmBl(
+            Integer id,
+            String name,
+            String description,
+            Integer duration,
+            LocalDate releaseDate,
+            Mpa mpa,
+            Set <Genre> genres,
+            Set <Integer> likes
+    ) {
+        return Film.builder()
+                .id(id)
+                .name(name)
+                .description(description)
+                .duration(duration)
+                .releaseDate(releaseDate)
+                .mpa(mpa)
+                .genres(genres)
+                .likes(likes)
+                .build();
+    }
 }

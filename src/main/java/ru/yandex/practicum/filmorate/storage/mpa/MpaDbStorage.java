@@ -20,11 +20,11 @@ public class MpaDbStorage implements MpaStorage {
 
     public List<Mpa> findAll() {
         List<Mpa> mpaList = new ArrayList<>();
-        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT rating_mpa_id, name FROM mpa_type");
+        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT rating_mpa_id, mpa_name FROM mpa_type");
         while (mpaRows.next()) {
             Mpa mpa = Mpa.builder()
                     .id(mpaRows.getInt("rating_mpa_id"))
-                    .name(mpaRows.getString("name"))
+                    .name(mpaRows.getString("mpa_name"))
                     .build();
             mpaList.add(mpa);
         }
@@ -32,7 +32,7 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     public Mpa getMpa(int mpaId) {
-        String sqlQuery = "SELECT rating_mpa_id, name FROM mpa_type WHERE rating_mpa_id=?";
+        String sqlQuery = "SELECT rating_mpa_id, mpa_name FROM mpa_type WHERE rating_mpa_id=?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToMpa, mpaId);
         } catch (RuntimeException e) {
@@ -43,7 +43,7 @@ public class MpaDbStorage implements MpaStorage {
     private Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
         return Mpa.builder()
                 .id(resultSet.getInt("rating_mpa_id"))
-                .name(resultSet.getString("name"))
+                .name(resultSet.getString("mpa_name"))
                 .build();
     }
 
