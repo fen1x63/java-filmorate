@@ -29,6 +29,7 @@ public class GenreService {
             genreDbStorage.updateGenresForCurrentFilm(film);
         }
     }
+
     public void addGenreNameToFilm(Film film) {
         if (Objects.isNull(film.getGenres())) {
             return;
