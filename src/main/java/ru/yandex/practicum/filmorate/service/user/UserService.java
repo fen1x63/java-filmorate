@@ -33,4 +33,10 @@ public class UserService {
         return userStorage.getMutualFriends(userId, otherId);
     }
 
+    public void validationUser(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+    }
+
 }

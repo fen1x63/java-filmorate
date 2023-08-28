@@ -12,13 +12,14 @@ import java.util.List;
 
 
 @Slf4j
-@RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/users", produces = "application/json")
+@RestController
+@RequestMapping("/users")
 public class UserController {
 
     private final UserStorage userStorage;
     private final UserService userService;
+
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
@@ -50,6 +51,7 @@ public class UserController {
         return userStorage.getUserById(id);
     }
 
+
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable Integer id) {
         log.info("Поступил запрос на получение списка друзей.");
@@ -67,4 +69,5 @@ public class UserController {
         log.info("Поступил запрос на удаление из друзей.");
         userService.deleteFriend(id, friendId);
     }
+
 }
