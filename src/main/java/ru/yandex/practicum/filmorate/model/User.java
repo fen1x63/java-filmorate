@@ -1,75 +1,32 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
-import lombok.NonNull;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.Set;
 
-
+@Getter
+@Setter
 @Builder
 public class User {
 
+    @NotNull
     private int id;
+
     @Email
-    @NonNull
-    private String email;
-    @NonNull
     @NotBlank
+    private String email;
+
+    @NotBlank
+    @Pattern(regexp = "^[a-zA-Z0-9]{1,20}$")
     private String login;
+
     private String name;
-    @Past
+
+    @PastOrPresent
+    @NotNull
     private LocalDate birthday;
-    private Set<Integer> friends;
-
-    public Set<Integer> getFriends() {
-        return friends;
-    }
-
-    public void setFriends(Set<Integer> friends) {
-        this.friends = friends;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDate getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday;
-    }
 }

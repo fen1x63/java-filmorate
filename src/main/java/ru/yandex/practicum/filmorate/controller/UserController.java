@@ -1,70 +1,62 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.user.UserService;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
 
 
-@Slf4j
 @RestController
-@RequiredArgsConstructor
-@RequestMapping(value = "/users", produces = "application/json")
+@RequestMapping("/users")
 public class UserController {
 
-    private final UserStorage userStorage;
     private final UserService userService;
 
-    @PostMapping
-    public User create(@Valid @RequestBody User user) {
-        log.info("Поступил запрос на создание пользователя.");
-        return userStorage.addUser(user);
-    }
-
-    @PutMapping
-    public User changeUser(@Valid @RequestBody User user) {
-        log.info("Поступил запрос на обновление пользователя.");
-        return userStorage.updateUser(user);
-    }
-
-    @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
-        log.info("Поступил запрос на добавления в друзья.");
-        return userService.addFriend(id, friendId);
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
-    public List<User> getUsers() {
-        log.info("Поступил запрос на получение списка пользователей.");
-        return userStorage.findAllUsers();
+    public List<User> getAllUsers() { //геттер для пользователей
+        return userService.getAllUsers();
     }
 
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable Integer id) {
-        log.info("Поступил запрос на получение пользователя по id.");
-        return userStorage.getUserById(id);
+    @PostMapping
+    public User createUser(@Valid @RequestBody User user) { //создание пользователя
+        return userService.createUser(user);
     }
 
-    @GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable Integer id) {
-        log.info("Поступил запрос на получение списка друзей.");
-        return userService.getUserFriends(id);
+    @PutMapping
+    public User updateUser(@Valid @RequestBody User user) { //обновление пользователя
+        return userService.updateUser(user);
     }
 
-    @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getMutualFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
-        log.info("Поступил запрос на получения списка общих друзей.");
-        return userService.getMutualFriends(id, otherId);
+    @PutMapping("/{id}/friends/{friendId}") //добавление в друзья
+    public void userAddFriend(@PathVariable("id") final Integer userId, @PathVariable("friendId") final Integer friendId) {
+        userService.userAddFriend(userId, friendId);
     }
 
-    @DeleteMapping("/{id}/friends/{friendId}")
-    public void deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
-        log.info("Поступил запрос на удаление из друзей.");
-        userService.deleteFriend(id, friendId);
+    @DeleteMapping("/{id}/friends/{friendId}") //удаление из друзей
+    public void userDeleteFriend(@PathVariable("id") final Integer userId, @PathVariable("friendId") final Integer friendId) {
+        userService.userDeleteFriend(userId, friendId);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")//геттер для списка общих друзей
+    public List<User> getListFriend(@PathVariable("id") final Integer userId, @PathVariable("otherId") final Integer friendId) {
+        return userService.getListFriend(userId, friendId);
+    }
+
+    @GetMapping("/{id}") //геттер по айди
+    public User getUserForId(@PathVariable int id) {
+        return userService.getUserForId(id);
+    }
+
+    @GetMapping("/{id}/friends")//получение списка друзей пользователя
+    public List<User> getFriendsUserForId(@PathVariable("id") Integer id) {
+        return userService.getFriendsUserForId(id);
     }
 }
