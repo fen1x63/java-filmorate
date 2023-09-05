@@ -2,77 +2,72 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@Component("InMemoryFilmStorage")
 @Slf4j
-@Component
 public class InMemoryFilmStorage implements FilmStorage {
-
-    private static final LocalDate UNCORRECTDATE = LocalDate.of(1895, 12, 28);
-    private final HashMap<Integer, Film> films = new HashMap<>();
-    private int idForFilm = 0;
+    private final Map<Integer, Film> allFilms = new HashMap<>();
+    private Integer filmIdSequence = 0;
 
     @Override
-    public List<Film> findAllFilms() {
-        return new ArrayList<>(films.values());
+    public Film getFilm(Integer id) {
+        return allFilms.get(id);
+    }
+
+    @Override
+    public List<Film> getAllFilms() {
+        log.info("Получен список всех фильмов.");
+        return new ArrayList<>(allFilms.values());
     }
 
     @Override
     public Film addFilm(Film film) {
-        filmValidation(film);
-        film.setLikes(new HashSet<>());
-        film.setId(getIdForFilm());
-        films.put(film.getId(), film);
-        log.info("Поступил запрос на добавление фильма. Фильм добавлен");
+        film.setId(++filmIdSequence);
+        allFilms.put(film.getId(), film);
+        log.info(String.format("Фильм %d успешно добавлен.", film.getId()));
         return film;
     }
 
     @Override
     public Film updateFilm(Film film) {
-        if (films.get(film.getId()) != null) {
-            filmValidation(film);
-            film.setLikes(new HashSet<>());
-            films.put(film.getId(), film);
-            log.info("Поступил запрос на изменения фильма. Фильм изменён.");
-        } else {
-            log.error("Поступил запрос на изменения фильма. Фильм не найден.");
-            throw new EntityNotFoundException("Film not found.");
-        }
+        if (!allFilms.containsKey(film.getId()))
+            throw new NotFoundException(String.format("Фильм %d не найден!", film.getId()));
+        allFilms.put(film.getId(), film);
+        log.info(String.format("Фильм %d успешно изменён.", film.getId()));
         return film;
     }
 
     @Override
-    public Film getFilmById(int id) {
-        if (films.containsKey(id)) {
-            return films.get(id);
-        } else {
-            throw new EntityNotFoundException("Film not found.");
-        }
+    public Film addLike(Integer id, Integer userId) {
+        Film film = allFilms.get(id);
+        if (film == null)
+            throw new NotFoundException(String.format("Фильм %d не найден!", id));
+        film.getLikes().add(userId);
+        log.info(String.format("Добавлен лайк фильму %d пользователем %d.", id, userId));
+        return film;
     }
 
-    private int getIdForFilm() {
-        return ++idForFilm;
+    @Override
+    public Film deleteLike(Integer id, Integer userId) {
+        Film film = allFilms.get(id);
+        if (film == null)
+            throw new NotFoundException(String.format("Фильм %d не найден!", id));
+        film.getLikes().remove(userId);
+        log.info(String.format("Удалён лайк фильму %d пользователем %d.", id, userId));
+        return film;
     }
 
-    private void filmValidation(Film film) {
-        if (film.getReleaseDate().isBefore(UNCORRECTDATE)
-                || film.getReleaseDate().isAfter(LocalDate.now())) {
-            throw new ValidationException("Некорректно указана дата релиза.");
-        }
-        if (film.getName().isEmpty()) {
-            throw new ValidationException("Некорректно указано название фильма.");
-        }
-        if (film.getDescription().length() > 200) {
-            throw new ValidationException("Превышено количество символов в описании фильма.");
-        }
-    }
+    @Override
+    public List<Film> getMostPopular(Integer count) {
+        return getAllFilms()
+                .stream().sorted(Comparator.comparing(Film::getLikesCount).reversed())
+                .limit(count)
+                .collect(Collectors.toList());
 
+    }
 }

@@ -1,10 +1,11 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
+@Data
 @AllArgsConstructor
-@Getter
-public class ErrorResponse {
-    private final String error;
+public class Genre {
+    private Integer id;
+    private String name;
 }
